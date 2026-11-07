@@ -10,6 +10,8 @@ import 'package:supermarket_manager_system/views/forgot_password_page.dart';
 import 'package:supermarket_manager_system/views/verify_otp_page.dart';
 import 'package:supermarket_manager_system/views/set_new_password_page.dart';
 import 'package:supermarket_manager_system/views/role_home_page.dart';
+import 'package:supermarket_manager_system/views/cashier_open_shift_page.dart';
+import 'package:supermarket_manager_system/views/cashier_dashboard_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,9 +100,23 @@ class SupermarketManagerApp extends StatelessWidget {
       ),
       GoRoute(
         path: '/cashier/open-shift',
-        builder: (context, state) => RoleHomePage(
-          role: AppSession.instance.role.isEmpty ? 'Cashier' : AppSession.instance.role,
+        builder: (context, state) => CashierOpenShiftPage(
           fullName: AppSession.instance.fullName,
+        ),
+      ),
+      GoRoute(
+        path: '/cashier/dashboard',
+        builder: (context, state) => CashierDashboardPage(
+          fullName: AppSession.instance.fullName,
+          userId: AppSession.instance.userId ?? 0,
+          initialTabKey: 'scanner',
+          initialPhone: '',
+          initialOrderId: null,
+          onNavigatePath: (path) => context.go(path),
+          onLogoutRequested: () {
+            AppSession.instance.clear();
+            context.go('/login');
+          },
         ),
       ),
       GoRoute(
