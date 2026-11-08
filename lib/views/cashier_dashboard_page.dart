@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:supermarket_manager_system/data/services/customer_api_service.dart';
 import 'package:supermarket_manager_system/data/services/order_api_service.dart';
 import 'package:supermarket_manager_system/data/services/product_api_service.dart';
@@ -349,6 +350,20 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
 
   String _normalizePhone(String raw) => raw.replaceAll(RegExp(r'[^\d]'), '');
 
+  bool _isValidPhone(String raw) {
+    final clean = _normalizePhone(raw);
+    return RegExp(r'^0[0-9]{9}$').hasMatch(clean);
+  }
+
+  String? get _scannerPhoneError {
+    final text = _scannerCustomerPhoneController.text.trim();
+    if (text.isEmpty) return null;
+    if (!_isValidPhone(text)) {
+      return 'SĐT không hợp lệ (cần 10 số, bắt đầu bằng 0)';
+    }
+    return null;
+  }
+
   void _syncScannerCustomerByPhoneLocal() {
     final normalized = _normalizePhone(_scannerCustomerPhoneController.text);
     CustomerListItem? matched;
@@ -435,6 +450,35 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
     if (_paymentMethod == null || _paymentMethod!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a payment method.')),
+      );
+      return;
+    }
+    final customerPhone = _scannerCustomerPhoneController.text.trim();
+    if (_paymentMethod == 'Credit') {
+      if (customerPhone.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Bán nợ (Credit) bắt buộc phải nhập số điện thoại khách hàng.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+      if (!_isValidPhone(customerPhone)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Số điện thoại không hợp lệ (cần 10 chữ số, bắt đầu bằng 0).'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    } else if (customerPhone.isNotEmpty && !_isValidPhone(customerPhone)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Số điện thoại khách hàng không hợp lệ (cần 10 chữ số, bắt đầu bằng 0).'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -811,6 +855,10 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
                             controller: phoneCtrl,
                             hint: 'e.g. 0901234567',
                             keyboardType: TextInputType.phone,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
                           ),
                           const SizedBox(height: 16),
                           _addCustomerField(
@@ -868,6 +916,17 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
                                     content: Text(
                                       'Phone and a valid Amount are required.',
                                     ),
+                                  ),
+                                );
+                                return;
+                              }
+                              if (!_isValidPhone(phone)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Số điện thoại không hợp lệ (cần 10 chữ số, bắt đầu bằng 0).',
+                                    ),
+                                    backgroundColor: Colors.red,
                                   ),
                                 );
                                 return;
@@ -976,6 +1035,7 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
     required TextEditingController controller,
     required String hint,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -992,6 +1052,7 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
         TextField(
           controller: controller,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
@@ -1186,6 +1247,11 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
                 const SizedBox(height: 10),
                 TextField(
                   controller: phoneController,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(10),
+                  ],
                   decoration: const InputDecoration(labelText: 'Phone'),
                 ),
                 const SizedBox(height: 10),
@@ -1222,6 +1288,17 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
                               content: Text(
                                 'Name, Phone, and Amount are required.',
                               ),
+                            ),
+                          );
+                          return;
+                        }
+                        if (!_isValidPhone(phone)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Số điện thoại không hợp lệ (cần 10 chữ số, bắt đầu bằng 0).',
+                              ),
+                              backgroundColor: Colors.red,
                             ),
                           );
                           return;
@@ -1322,17 +1399,22 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             SizedBox(
-              width: 240,
+              width: 270,
               child: TextField(
                 controller: _scannerCustomerPhoneController,
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ],
+                decoration: InputDecoration(
                   labelText: 'Buyer Phone',
                   hintText: 'Enter customer phone',
+                  errorText: _scannerPhoneError,
                   isDense: true,
                   filled: true,
                   fillColor: Colors.white,
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ),
@@ -1493,6 +1575,8 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
                     label: 'Phone',
                     hint: 'Optional [Required for credit sales]',
                     controller: _scannerCustomerPhoneController,
+                    isPhone: true,
+                    errorText: _scannerPhoneError,
                   ),
                   ElevatedButton(
                     onPressed: _openAddCustomerForPointsDialog,
@@ -2199,14 +2283,24 @@ class _CashierDashboardPageState extends State<CashierDashboardPage> {
     required String label,
     required String hint,
     required TextEditingController controller,
+    bool isPhone = false,
+    String? errorText,
   }) {
     return SizedBox(
       width: 280,
       child: TextField(
         controller: controller,
+        keyboardType: isPhone ? TextInputType.phone : TextInputType.text,
+        inputFormatters: isPhone
+            ? [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ]
+            : null,
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
+          errorText: errorText,
           border: const OutlineInputBorder(),
           isDense: true,
         ),
