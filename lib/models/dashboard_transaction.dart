@@ -6,6 +6,9 @@ class DashboardTransaction {
   final String status;
   final String createdAt;
 
+  String get customerName => cashierName;
+  String get orderTime => createdAt;
+
   DashboardTransaction({
     required this.orderNo,
     required this.paymentMethod,

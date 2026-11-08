@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:supermarket_manager_system/data/local/mobile_app_database.dart';
 import 'package:supermarket_manager_system/dto/user_dto.dart';
 import 'package:supermarket_manager_system/mappers/user_mapper.dart';
@@ -82,3 +83,7 @@ class UserViewModel extends ChangeNotifier {
     await loadUsers();
   }
 }
+
+final userViewModelProvider =
+    ChangeNotifierProvider<UserViewModel>((ref) => UserViewModel());
+

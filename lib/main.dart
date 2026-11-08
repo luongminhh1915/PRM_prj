@@ -17,6 +17,8 @@ import 'package:supermarket_manager_system/views/user_detail_page.dart';
 import 'package:supermarket_manager_system/views/customers_page.dart';
 import 'package:supermarket_manager_system/views/orders_page.dart';
 import 'package:supermarket_manager_system/views/creditors_page.dart';
+import 'package:supermarket_manager_system/views/manager_dashboard_page.dart';
+import 'package:supermarket_manager_system/views/admin_dashboard_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -91,16 +93,16 @@ class SupermarketManagerApp extends StatelessWidget {
       ),
       GoRoute(
         path: '/admin/dashboard',
-        builder: (context, state) => RoleHomePage(
-          role: AppSession.instance.role.isEmpty ? 'Admin' : AppSession.instance.role,
+        builder: (context, state) => AdminDashboardPage(
           fullName: AppSession.instance.fullName,
+          userId: AppSession.instance.userId ?? 1,
         ),
       ),
       GoRoute(
         path: '/manager/dashboard',
-        builder: (context, state) => RoleHomePage(
-          role: AppSession.instance.role.isEmpty ? 'Manager' : AppSession.instance.role,
+        builder: (context, state) => ManagerDashboardPage(
           fullName: AppSession.instance.fullName,
+          userId: AppSession.instance.userId ?? 2,
         ),
       ),
       GoRoute(
