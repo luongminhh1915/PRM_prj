@@ -12,6 +12,11 @@ import 'package:supermarket_manager_system/views/set_new_password_page.dart';
 import 'package:supermarket_manager_system/views/role_home_page.dart';
 import 'package:supermarket_manager_system/views/cashier_open_shift_page.dart';
 import 'package:supermarket_manager_system/views/cashier_dashboard_page.dart';
+import 'package:supermarket_manager_system/views/users_page.dart';
+import 'package:supermarket_manager_system/views/user_detail_page.dart';
+import 'package:supermarket_manager_system/views/customers_page.dart';
+import 'package:supermarket_manager_system/views/orders_page.dart';
+import 'package:supermarket_manager_system/views/creditors_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -118,6 +123,29 @@ class SupermarketManagerApp extends StatelessWidget {
             context.go('/login');
           },
         ),
+      ),
+      GoRoute(
+        path: '/users',
+        builder: (context, state) => const UsersPage(),
+      ),
+      GoRoute(
+        path: '/user-detail/:userId',
+        builder: (context, state) {
+          final userId = int.tryParse(state.pathParameters['userId'] ?? '0') ?? 0;
+          return UserDetailPage(userId: userId);
+        },
+      ),
+      GoRoute(
+        path: '/customers',
+        builder: (context, state) => const CustomersPage(),
+      ),
+      GoRoute(
+        path: '/orders',
+        builder: (context, state) => const OrdersPage(),
+      ),
+      GoRoute(
+        path: '/creditors',
+        builder: (context, state) => const CreditorsPage(),
       ),
       GoRoute(
         path: '/admin',
