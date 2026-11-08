@@ -221,3 +221,4 @@ class _UpdateProductDialogState extends ConsumerState<UpdateProductDialog> {
     );
   }
 }
+
