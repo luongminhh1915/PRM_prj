@@ -25,7 +25,9 @@ class ReportApiService {
     final rows = await db.rawQuery(
       '''
       SELECT strftime('%m', order_date) as m, 
-             SUM(total_payable) as total_rev, 
+             SUM(total_payable) as total_rev,
+             SUM(CASE WHEN payment_method = 'Cash' THEN total_payable ELSE 0 END) as cash_rev,
+             SUM(CASE WHEN payment_method != 'Cash' THEN total_payable ELSE 0 END) as transfer_rev,
              COUNT(id) as ord_count
       FROM sales_orders
       WHERE strftime('%Y', order_date) = ?
@@ -49,11 +51,15 @@ class ReportApiService {
     for (int m = 1; m <= 12; m++) {
       final row = byMonth[m];
       final rev = (row?['total_rev'] as num?)?.toDouble() ?? 0.0;
+      final cashRev = (row?['cash_rev'] as num?)?.toDouble() ?? 0.0;
+      final transferRev = (row?['transfer_rev'] as num?)?.toDouble() ?? 0.0;
       final count = (row?['ord_count'] as num?)?.toInt() ?? 0;
       result.add(
         RevenueReportItem(
           label: _monthLabels[m - 1],
           totalRevenue: rev,
+          cashRevenue: cashRev,
+          transferRevenue: transferRev,
           orderCount: count,
         ),
       );
@@ -72,7 +78,9 @@ class ReportApiService {
     final rows = await db.rawQuery(
       '''
       SELECT strftime('%d', order_date) as d, 
-             SUM(total_payable) as total_rev, 
+             SUM(total_payable) as total_rev,
+             SUM(CASE WHEN payment_method = 'Cash' THEN total_payable ELSE 0 END) as cash_rev,
+             SUM(CASE WHEN payment_method != 'Cash' THEN total_payable ELSE 0 END) as transfer_rev,
              COUNT(id) as ord_count
       FROM sales_orders
       WHERE strftime('%Y-%m', order_date) = ?
@@ -92,17 +100,20 @@ class ReportApiService {
       }
     }
 
-    // Number of days in month
     final daysInMonth = DateTime(year, month + 1, 0).day;
     final List<RevenueReportItem> result = [];
     for (int d = 1; d <= daysInMonth; d++) {
       final row = byDay[d];
       final rev = (row?['total_rev'] as num?)?.toDouble() ?? 0.0;
+      final cashRev = (row?['cash_rev'] as num?)?.toDouble() ?? 0.0;
+      final transferRev = (row?['transfer_rev'] as num?)?.toDouble() ?? 0.0;
       final count = (row?['ord_count'] as num?)?.toInt() ?? 0;
       result.add(
         RevenueReportItem(
           label: d.toString().padLeft(2, '0'),
           totalRevenue: rev,
+          cashRevenue: cashRev,
+          transferRevenue: transferRev,
           orderCount: count,
         ),
       );

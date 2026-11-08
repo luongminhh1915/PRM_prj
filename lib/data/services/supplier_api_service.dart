@@ -1,5 +1,6 @@
 import 'package:supermarket_manager_system/data/local/mobile_app_database.dart';
 import 'package:supermarket_manager_system/models/supplier_list_item.dart';
+import 'package:supermarket_manager_system/models/product_list_item.dart';
 
 class SupplierApiService {
   Future<List<SupplierListItem>> getSuppliers() async {
@@ -44,6 +45,34 @@ class SupplierApiService {
       status: r['status'] as String? ?? 'active',
       createdAt: r['created_at']?.toString(),
     );
+  }
+
+  Future<List<ProductListItem>> getSupplierProducts(int supplierId) async {
+    final db = await MobileAppDatabase.instance.database;
+    final rows = await db.rawQuery(
+      '''
+      SELECT p.id, p.barcode, p.product_name, c.name as category_name, 
+             p.expiry_date, p.selling_price, p.in_stock, p.status
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.supplier_id = ?
+      ORDER BY p.id ASC
+      ''',
+      [supplierId],
+    );
+
+    return rows.map((r) {
+      return ProductListItem(
+        id: r['id'] as int? ?? 0,
+        barcode: r['barcode'] as String? ?? '',
+        productName: r['product_name'] as String? ?? '—',
+        categoryName: r['category_name'] as String? ?? '—',
+        expiryDate: r['expiry_date']?.toString() ?? '—',
+        sellingPrice: (r['selling_price'] as num?)?.toDouble() ?? 0.0,
+        inStock: (r['in_stock'] as num?)?.toInt() ?? 0,
+        status: r['status'] as String? ?? 'In Stock',
+      );
+    }).toList();
   }
 
   Future<void> createSupplier({

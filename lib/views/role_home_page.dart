@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supermarket_manager_system/utils/app_session.dart';
 
-class RoleHomePage extends StatelessWidget {
+class RoleHomePage extends StatefulWidget {
   const RoleHomePage({
     super.key,
     required this.role,
@@ -11,6 +11,30 @@ class RoleHomePage extends StatelessWidget {
 
   final String role;
   final String fullName;
+
+  @override
+  State<RoleHomePage> createState() => _RoleHomePageState();
+}
+
+class _RoleHomePageState extends State<RoleHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _redirectByRole();
+    });
+  }
+
+  void _redirectByRole() {
+    final roleUpper = widget.role.trim().toUpperCase();
+    if (roleUpper == 'ADMIN') {
+      context.go('/admin/dashboard');
+    } else if (roleUpper == 'MANAGER') {
+      context.go('/manager/dashboard');
+    } else if (roleUpper == 'CASHIER') {
+      context.go('/cashier/open-shift');
+    }
+  }
 
   Future<void> _logout(BuildContext context) async {
     final confirmed = await showDialog<bool>(
@@ -55,10 +79,17 @@ class RoleHomePage extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Text(
-          'Welcome ${fullName.isEmpty ? 'User' : fullName}\nRole: $role',
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              'Xin chào ${widget.fullName.isEmpty ? 'User' : widget.fullName}\nRole: ${widget.role}\nĐang chuyển hướng...',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
         ),
       ),
     );
