@@ -127,6 +127,103 @@ class SupermarketManagerApp extends StatelessWidget {
         ),
       ),
       GoRoute(
+        path: '/cashier/barcode-scanner',
+        builder: (context, state) => CashierDashboardPage(
+          fullName: AppSession.instance.fullName,
+          userId: AppSession.instance.userId ?? 0,
+          initialTabKey: 'scanner',
+          initialPhone: '',
+          initialOrderId: null,
+          onNavigatePath: (path) => context.go(path),
+          onLogoutRequested: () {
+            AppSession.instance.clear();
+            context.go('/login');
+          },
+        ),
+      ),
+      GoRoute(
+        path: '/cashier/customers',
+        builder: (context, state) => CashierDashboardPage(
+          fullName: AppSession.instance.fullName,
+          userId: AppSession.instance.userId ?? 0,
+          initialTabKey: 'customers',
+          initialPhone: '',
+          initialOrderId: null,
+          onNavigatePath: (path) => context.go(path),
+          onLogoutRequested: () {
+            AppSession.instance.clear();
+            context.go('/login');
+          },
+        ),
+      ),
+      GoRoute(
+        path: '/cashier/customers/history',
+        builder: (context, state) {
+          final phone = state.uri.queryParameters['phone'] ?? '';
+          return CashierDashboardPage(
+            fullName: AppSession.instance.fullName,
+            userId: AppSession.instance.userId ?? 0,
+            initialTabKey: 'customer-history',
+            initialPhone: phone,
+            initialOrderId: null,
+            onNavigatePath: (path) => context.go(path),
+            onLogoutRequested: () {
+              AppSession.instance.clear();
+              context.go('/login');
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: '/cashier/orders/detail',
+        builder: (context, state) {
+          final orderId = int.tryParse(state.uri.queryParameters['orderId'] ?? '');
+          final phone = state.uri.queryParameters['phone'] ?? '';
+          return CashierDashboardPage(
+            fullName: AppSession.instance.fullName,
+            userId: AppSession.instance.userId ?? 0,
+            initialTabKey: 'order-detail',
+            initialPhone: phone,
+            initialOrderId: orderId,
+            onNavigatePath: (path) => context.go(path),
+            onLogoutRequested: () {
+              AppSession.instance.clear();
+              context.go('/login');
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: '/cashier/profile',
+        builder: (context, state) => CashierDashboardPage(
+          fullName: AppSession.instance.fullName,
+          userId: AppSession.instance.userId ?? 0,
+          initialTabKey: 'profile',
+          initialPhone: '',
+          initialOrderId: null,
+          onNavigatePath: (path) => context.go(path),
+          onLogoutRequested: () {
+            AppSession.instance.clear();
+            context.go('/login');
+          },
+        ),
+      ),
+      GoRoute(
+        path: '/cashier/profile/edit',
+        builder: (context, state) => CashierDashboardPage(
+          fullName: AppSession.instance.fullName,
+          userId: AppSession.instance.userId ?? 0,
+          initialTabKey: 'profile-edit',
+          initialPhone: '',
+          initialOrderId: null,
+          onNavigatePath: (path) => context.go(path),
+          onLogoutRequested: () {
+            AppSession.instance.clear();
+            context.go('/login');
+          },
+        ),
+      ),
+      GoRoute(
         path: '/users',
         builder: (context, state) => const UsersPage(),
       ),
