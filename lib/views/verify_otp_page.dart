@@ -72,7 +72,7 @@ class _VerifyOtpPageState extends ConsumerState<VerifyOtpPage> {
     }
     setState(() => _isResending = true);
     try {
-      await ref.read(authViewModelProvider.notifier).forgotPassword(email);
+      final msg = await ref.read(authViewModelProvider.notifier).forgotPassword(email);
       if (!mounted) return;
       // Clear OTP fields
       for (var c in _controllers) {
@@ -81,7 +81,10 @@ class _VerifyOtpPageState extends ConsumerState<VerifyOtpPage> {
       _focusNodes[0].requestFocus();
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('OTP resent to your email')));
+      ).showSnackBar(SnackBar(
+        duration: const Duration(seconds: 10),
+        content: Text(msg),
+      ));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(

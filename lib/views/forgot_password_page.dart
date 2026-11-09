@@ -37,11 +37,14 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
 
     setState(() => _isLoading = true);
     try {
-      await ref.read(authViewModelProvider.notifier).forgotPassword(email);
+      final msg = await ref.read(authViewModelProvider.notifier).forgotPassword(email);
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('OTP sent to your email')));
+      ).showSnackBar(SnackBar(
+        duration: const Duration(seconds: 10),
+        content: Text(msg),
+      ));
       context.push('/verify-otp?email=${Uri.encodeComponent(email)}');
     } catch (e) {
       if (!mounted) return;
