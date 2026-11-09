@@ -5,6 +5,10 @@ import 'package:supermarket_manager_system/views/dashboard_content.dart';
 import 'package:supermarket_manager_system/views/revenue_report_page.dart';
 import 'package:supermarket_manager_system/views/suppliers_page.dart';
 import 'package:supermarket_manager_system/views/profile_content_page.dart';
+import 'package:supermarket_manager_system/views/users_page.dart';
+import 'package:supermarket_manager_system/views/customers_page.dart';
+import 'package:supermarket_manager_system/views/orders_page.dart';
+import 'package:supermarket_manager_system/views/creditors_page.dart';
 import 'package:supermarket_manager_system/models/user_detail.dart';
 
 class AdminDashboardPage extends StatefulWidget {
@@ -178,6 +182,30 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   activeIcon: Icons.bar_chart,
                 ),
                 _sidebarItem(
+                  key: 'users',
+                  label: 'Quản Lý Nhân Viên',
+                  icon: Icons.people_alt_outlined,
+                  activeIcon: Icons.people_alt,
+                ),
+                _sidebarItem(
+                  key: 'customers',
+                  label: 'Khách Hàng Thân Thiết',
+                  icon: Icons.group_outlined,
+                  activeIcon: Icons.group,
+                ),
+                _sidebarItem(
+                  key: 'orders',
+                  label: 'Quản Lý Đơn Hàng',
+                  icon: Icons.receipt_long_outlined,
+                  activeIcon: Icons.receipt_long,
+                ),
+                _sidebarItem(
+                  key: 'creditors',
+                  label: 'Sổ Nợ / Công Nợ',
+                  icon: Icons.account_balance_wallet_outlined,
+                  activeIcon: Icons.account_balance_wallet,
+                ),
+                _sidebarItem(
                   key: 'suppliers',
                   label: 'Quản Lý Nhà Cung Cấp',
                   icon: Icons.local_shipping_outlined,
@@ -299,6 +327,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           isCompact: isCompact,
           currentTimeText: timeText,
         );
+      case 'users':
+        return const UsersPage();
+      case 'customers':
+        return const CustomersPage();
+      case 'orders':
+        return const OrdersPage();
+      case 'creditors':
+        return const CreditorsPage();
       case 'suppliers':
         return SuppliersPage(
           fullName: widget.fullName,

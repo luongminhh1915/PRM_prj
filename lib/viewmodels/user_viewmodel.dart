@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:supermarket_manager_system/data/local/mobile_app_database.dart';
+import 'package:supermarket_manager_system/data/services/user_api_service.dart';
 import 'package:supermarket_manager_system/dto/user_dto.dart';
 import 'package:supermarket_manager_system/mappers/user_mapper.dart';
 
@@ -69,6 +70,26 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> createUser({
+    required String fullname,
+    required String username,
+    required String email,
+    required String password,
+    required String userRole,
+    String? idCard,
+  }) async {
+    final api = UserApiService();
+    await api.createUser(
+      fullname: fullname,
+      username: username,
+      email: email,
+      password: password,
+      userRole: userRole,
+      idCard: idCard,
+    );
+    await loadUsers();
+  }
+
   Future<void> updateUserStatus(int userId, String status) async {
     final db = await MobileAppDatabase.instance.database;
     await db.update(
@@ -82,8 +103,25 @@ class UserViewModel extends ChangeNotifier {
     );
     await loadUsers();
   }
+
+  Future<void> updateUserRole(int userId, String newRole) async {
+    final db = await MobileAppDatabase.instance.database;
+    int roleId = 3;
+    final cleanRole = newRole.trim().toUpperCase();
+    if (cleanRole == 'ADMIN') roleId = 1;
+    if (cleanRole == 'MANAGER') roleId = 2;
+    await db.update(
+      'users',
+      {
+        'role_id': roleId,
+        'updated_at': DateTime.now().toIso8601String(),
+      },
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+    await loadUsers();
+  }
 }
 
 final userViewModelProvider =
     ChangeNotifierProvider<UserViewModel>((ref) => UserViewModel());
-
