@@ -20,7 +20,7 @@ class MobileAppDatabase {
     final path = p.join(dbPath, 'supermarket_mobile_v2.db');
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       onConfigure: (db) async {
         await db.execute('PRAGMA busy_timeout = 5000');
         await db.execute('PRAGMA journal_mode = WAL');
@@ -28,6 +28,14 @@ class MobileAppDatabase {
       onCreate: (db, version) async {
         await _createTables(db);
         await _seedData(db);
+      },
+      onOpen: (db) async {
+        await db.execute(
+          "UPDATE users SET email = 'hs186587tahuydat@gmail.com' WHERE id = 2 OR username = 'manager01'",
+        );
+        await db.execute(
+          "UPDATE password_reset_tokens SET email = 'hs186587tahuydat@gmail.com' WHERE user_id = 2",
+        );
       },
     );
   }
@@ -265,7 +273,7 @@ class MobileAppDatabase {
       'username': 'manager01',
       'password_hash': 'manager01',
       'fullname': 'Manager One',
-      'email': 'manager01@supermarket.com',
+      'email': 'hs186587tahuydat@gmail.com',
       'role_id': 2,
       'id_card': 'ID100002',
       'phone': '0901000002',
@@ -943,7 +951,7 @@ class MobileAppDatabase {
     await db.insert('password_reset_tokens', {
       'id': 2,
       'user_id': 2,
-      'email': 'manager01@supermarket.com',
+      'email': 'hs186587tahuydat@gmail.com',
       'token': 'prt_manager_0001',
       'otp': '222222',
       'expires_at': '2099-12-31 23:59:59',
